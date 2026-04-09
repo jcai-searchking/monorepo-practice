@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+    ADMIN
+    HOST
+    PLAYER
+}
+
+
+// --- The People ---
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  passwordHash  String
+  name          String
+  birthDate     DateTime      @db.Date
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  refreshTokens RefreshToken[]
+  role          Role          @default(PLAYER)
+  lobbies       Lobby[]       @relation("HostedLobbies")
+}
+
+// --- The Games ---
+model Lobby {
+    id          String       @id @default(uuid())
+    title       String
+    location    String
+    date        DateTime
+    cost        Float
+
+    hostId      String
+    host        User         @relation("HostedLobbies", fields: [hostId], references: [id])
+}
+
+model RefreshToken {
+  id          Int       @id @default(autoincrement())
+  tokenHash   String    @unique
+  userId      String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
