@@ -1,6 +1,7 @@
 import { createUser } from '../../src/users/users.services';
 import { prisma } from '../../src/prisma';
 import argon2 from 'argon2';
+import { Role } from '@prisma/client'
 import {
     jest,
     describe,
@@ -38,7 +39,7 @@ describe('createUser', () => {
             password: 'Password123!',
             name: 'Test User',
             birthDate: new Date('1991-01-01'),
-            role: 'PLAYER',
+            role: Role.PLAYER,
         };
 
         const mockReturnedUser = {
@@ -46,9 +47,11 @@ describe('createUser', () => {
             email: mockInput.email,
             name: mockInput.name,
             birthDate: mockInput.birthDate,
-            passwordHash: 'fake_hashed_password', // Added passwordHash
-            role: mockInput.role,
+            passwordHash: 'fake_hashed_password',
+            role: Role.PLAYER,
             createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: null,
         };
         jest.mocked(prisma.user.findUnique).mockResolvedValueOnce(null); // "No duplicate found!"
         jest.mocked(argon2.hash).mockResolvedValue('fake_hashed_password'); // "Here is the hash!"
@@ -77,4 +80,25 @@ describe('createUser', () => {
 
         expect(result).toEqual(mockReturnedUser);
     });
-});
+
+    it('should throw an appError if the email is already registered', async () => {
+        const mockInput = {
+            email: 'duplicate@jeff.com',
+            password: 'Password123!',
+            name: 'Test User',
+            birthDate: new Date('1992-08-1'),
+            role: Role.PLAYER,
+        }
+
+        jest.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 'existing-id',
+            email: mockInput.email,
+        } as any );
+        await expect(createUser(mockInput)).rejects.toThrow(
+            'This email is already registered. Please log in with your email'
+        )
+        expect(argon2.hash).not.toHaveBeenCalled();
+        expect(prisma.user.create).not.toHaveBeenCalled();
+
+    });
+})
