@@ -26,7 +26,7 @@ jest.mock('argon2', () => ({
 }));
 
 describe('createUser', () => {
-    // This clears our "tape recorders" before every test so old data doesn't leak
+    // This clears the data before every test so old data doesn't leak
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -34,7 +34,6 @@ describe('createUser', () => {
     it('should successfully hash the password and save the user', async () => {
         //1. Set the stage
         const mockInput = {
-            // Missing comma fixed here
             email: 'test@example.com',
             password: 'Password123!',
             name: 'Test User',
@@ -99,6 +98,6 @@ describe('createUser', () => {
         )
         expect(argon2.hash).not.toHaveBeenCalled();
         expect(prisma.user.create).not.toHaveBeenCalled();
-
+  
     });
 })

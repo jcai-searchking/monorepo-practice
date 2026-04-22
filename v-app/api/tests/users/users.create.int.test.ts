@@ -3,7 +3,6 @@ import { prisma } from '../../src/prisma';
 import { Role } from '@prisma/client';
 import argon2 from 'argon2';
 import { describe, it, expect, beforeAll, afterAll, afterEach } from '@jest/globals';
-import { mock } from 'node:test';
 
 describe('createUser Integration', () => {
     // 1. setup: wipe database
