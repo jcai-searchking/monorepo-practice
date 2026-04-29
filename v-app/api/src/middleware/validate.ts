@@ -1,8 +1,8 @@
-import { ZodSchema } from "zod";
+import { ZodType } from "zod";
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from "../errors/AppErrors";
 
-export function validateBody(schema:ZodSchema) {
+export function validateBody(schema:ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.body)
        
@@ -14,7 +14,7 @@ export function validateBody(schema:ZodSchema) {
     }
 }
 
-export function validateQuery(schema:ZodSchema) {
+export function validateQuery(schema:ZodType) {
     return (req: Request, res:Response, next: NextFunction) => {
         const result = schema.safeParse(req.query)
 
@@ -27,7 +27,7 @@ export function validateQuery(schema:ZodSchema) {
     }
 }
 
-export function validateParams(schema: ZodSchema) {
+export function validateParams(schema: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.params)
         if (!result.success) {

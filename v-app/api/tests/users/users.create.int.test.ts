@@ -3,20 +3,21 @@ import { prisma } from '../../src/prisma';
 import { Role } from '@prisma/client';
 import argon2 from 'argon2';
 import { describe, it, expect, beforeAll, afterAll, afterEach } from '@jest/globals';
+import { resetDb, disconnectDb } from '../helpers/db';
 
 describe('createUser Integration', () => {
     // 1. setup: wipe database
     beforeAll(async () => {
-        await prisma.user.deleteMany();
+        await resetDb();
     })
     // 2. cleanup: wipe the database after every single test
     // ensures tests dont interfere with each other
     afterEach(async () => {
-        await prisma.user.deleteMany();
+        await resetDb();
     })
     // 3. teardown: close the connection so Jest can exit
     afterAll(async () => {
-        await prisma.$disconnect();
+        await disconnectDb();
     })
 
     it('should successfully save user to a REAL database', async () => {
