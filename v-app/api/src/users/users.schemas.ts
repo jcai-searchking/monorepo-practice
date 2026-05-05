@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Role } from '@prisma/client';
 
 export const createUserSchema = z.object({
-    email: z.string().email().toLowerCase().trim(),
+    email: z.string().toLowerCase().trim().pipe(z.email()),
     password: z
         .string()
         .min(8, 'Password must be at least 8 characters long')
@@ -19,7 +19,7 @@ export const createUserSchema = z.object({
 });
 
 export const userParamSchema = z.object({
-    id: z.string().trim().cuid('Invalid user ID format')
+    id: z.string().trim().pipe(z.uuid('Invalid user ID format')),
 })
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
