@@ -13,11 +13,12 @@ export const createUser = async ( req:Request, res: Response, next: NextFunction
     }
 }
 
-export const getUser = async (req: Request, res: Response, next: NextFunction) => {
+export const getUser = async ( req: Request, res: Response, next: NextFunction ) => {
     try {
         const { id } = req.validatedParams as UserParamInput
         const user = await UserServices.getUserByIdService(id)
-        res.status(200).json({user})
+
+        res.status(200).json({ success: true, user})
     } catch (error) {
         next(error)
     }
