@@ -22,5 +22,9 @@ export const userParamSchema = z.object({
     id: z.string().trim().pipe(z.uuid('Invalid user ID format')),
 })
 
+export const updateUserSchema = createUserSchema.partial();
+
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
-export type UserParamInput = z.infer<typeof userParamSchema>
+export type UserParamInput = z.infer<typeof userParamSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as UserServices from './users.services';
-import { CreateUserInput, UserParamInput } from './users.schemas'
+import { CreateUserInput, UserParamInput, UpdateUserInput } from './users.schemas'
 
 export const createUser = async ( req:Request, res: Response, next: NextFunction ) => {
     try {
@@ -21,5 +21,17 @@ export const getUser = async ( req: Request, res: Response, next: NextFunction )
         res.status(200).json({ success: true, user})
     } catch (error) {
         next(error)
+    }
+}
+
+export const updateUser = async (req: Request, res: Response, next: NextFunction ) => {
+    try {
+        const { id } = req.validatedParams as UserParamInput
+        const updatedData = req.validatedBody as UpdateUserInput
+        const updatedUser = await UserServices.updateUserService(id, updatedData)
+
+        res.status(200).json({ success: true, updatedUser})
+    } catch (error) {
+        next(error)    
     }
 }

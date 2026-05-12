@@ -1,6 +1,6 @@
 import { prisma } from '../prisma';
 import argon2 from 'argon2';
-import { CreateUserInput } from './users.schemas';
+import { CreateUserInput, UpdateUserInput,  } from './users.schemas';
 import { AppError } from '../errors/AppErrors';
 
 export const createUser = async (data: CreateUserInput) => {
@@ -47,4 +47,15 @@ export const getUserByIdService = async (id: string) => {
     })
     if (!user) throw new AppError('User not found', 404)
     return user
+}
+
+export const updateUserService = async (id:string, updateData: UpdateUserInput) => {
+    const updatedUser = await prisma.user.update({
+        where: {
+            id: id,
+        },
+        data: updateData
+    });
+    if (!updatedUser) throw new AppError('User not found', 404)
+    return updatedUser
 }
