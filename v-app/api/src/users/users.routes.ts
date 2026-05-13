@@ -15,5 +15,6 @@ router.get('/:id', validateParams(userParamSchema), UserController.getUser)
 router.patch('/:id', validateParams(userParamSchema), validateBody(updateUserSchema), UserController.updateUser)
 
 // Delete User by ID
+router.delete('/:id', validateParams(userParamSchema), UserController.deleteUser)
 
 export default router;

@@ -17,8 +17,6 @@ describe('GET /users/id (GET User API)', () => {
         const testUser = await seedUser()
 
         const res = await request(app).get(`/users/${testUser.id}`)
-        console.log("ZOD ERROR BODY:", res.body);
-        console.log("THE ID WE SENT:", testUser.id);
 
         expect(res.status).toBe(200)
         expect(res.body.user.name).toBe(testUser.name)

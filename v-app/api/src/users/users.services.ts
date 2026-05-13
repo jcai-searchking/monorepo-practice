@@ -50,12 +50,46 @@ export const getUserByIdService = async (id: string) => {
 }
 
 export const updateUserService = async (id:string, updateData: UpdateUserInput) => {
-    const updatedUser = await prisma.user.update({
-        where: {
-            id: id,
+    const user = await prisma.user.findFirst({
+        where: {id, deletedAt: null}
+    })
+    if (!user) throw new AppError('User not found', 404)
+
+    const { password, ...data } = updateData;
+    let passwordHash: string | undefined;
+
+    if (password) {
+        passwordHash = await argon2.hash(password);
+    }
+
+    return await prisma.user.update({
+        where: { id },
+        data: {
+            ...data,
+            ...(passwordHash && { passwordHash }),
         },
-        data: updateData
+        select: {
+            id: true,
+            email: true,
+            name: true,
+            birthDate: true,
+            role: true,
+            createdAt: true,
+        },
     });
-    if (!updatedUser) throw new AppError('User not found', 404)
-    return updatedUser
+}
+
+export const deleteUserService = async (id:string) => {
+    const user = await prisma.user.findFirst({
+        where: { id, deletedAt: null}
+    })
+    if (!user) throw new AppError('User not found', 404)
+
+    return await prisma.user.update({
+        where: { id },
+        data: {
+            deletedAt: new Date()
+        },
+        select: { id: true, email: true, name: true, deletedAt: true }
+    })
 }
