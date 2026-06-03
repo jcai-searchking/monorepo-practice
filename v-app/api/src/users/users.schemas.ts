@@ -29,7 +29,15 @@ export const updateUserSchema = createUserSchema.pick({
     email: true,
 }).partial();
 
+export const googleUserPayloadSchema = z.object({
+    sub: z.string().trim().min(1),
+    email: z.string().trim().toLowerCase().pipe(z.email()),
+    name: z.string().trim().min(1),
+    picture: z.string().trim().pipe(z.url()).optional()
+})
+
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UserParamInput = z.infer<typeof userParamSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type GoogleUserPayload = z.infer<typeof googleUserPayloadSchema>;
