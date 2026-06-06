@@ -33,7 +33,8 @@ export const googleUserPayloadSchema = z.object({
     sub: z.string().trim().min(1),
     email: z.string().trim().toLowerCase().pipe(z.email()),
     name: z.string().trim().min(1),
-    picture: z.string().trim().pipe(z.url()).optional()
+    emailVerified: z.boolean(),
+    picture: z.string().trim().pipe(z.url()).optional(),
 })
 
 

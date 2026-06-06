@@ -37,6 +37,7 @@
         "bullmq": "^5.67.2",
         "cookie-parser": "^1.4.7",
         "express": "^5.2.1",
+        "google-auth-library": "^10.6.2",
         "ioredis": "^5.9.2",
         "jsonwebtoken": "^9.0.3",
         "pg": "^8.16.3",
