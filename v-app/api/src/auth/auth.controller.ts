@@ -2,6 +2,7 @@ import type { GoogleLoginInput } from './auth.schemas'
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken'
 import { verifyGoogleToken, findOrCreateGoogleUser } from './auth.service'
+import { ENV } from '../config/env'
 
 export async function googleLoginController(req: Request<{}, {}, GoogleLoginInput>, res: Response, next: NextFunction) {
 
@@ -12,7 +13,7 @@ export async function googleLoginController(req: Request<{}, {}, GoogleLoginInpu
         const user = await findOrCreateGoogleUser(claims)
         const accessToken = jwt.sign(
             { sub: user.id },
-            process.env.JWT_SECRET!,
+            ENV.JWT_SECRET,
             { expiresIn: '15m' }
         )
         return res.status(200).json({ user, accessToken })

@@ -1,7 +1,8 @@
 const requiredEnvVars = [
     "NODE_ENV",
     'DATABASE_URL',
-    'GOOGLE_CLIENT_ID'
+    'GOOGLE_CLIENT_ID',
+    'JWT_SECRET',
 ] as const;
 
 for (const envVar of requiredEnvVars) {
@@ -14,6 +15,7 @@ for (const envVar of requiredEnvVars) {
 
 export const ENV = {
     NODE_ENV: process.env.NODE_ENV!,
-    DATABASE_URL: process.env.DATABASE_URL,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    DATABASE_URL: process.env.DATABASE_URL!,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+    JWT_SECRET: process.env.JWT_SECRET!,
 }
