@@ -1,21 +1,21 @@
-import { ZodSchema } from "zod";
+import { ZodType } from "zod";
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from "../errors/AppErrors";
 
-export function validateBody(schema:ZodSchema) {
+export function validateBody(schema: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.body)
-       
+
         if (!result.success) {
             throw new AppError("Invalid request body", 400)
         }
-        req.validatedBody = result.data 
+        req.validatedBody = result.data
         next()
     }
 }
 
-export function validateQuery(schema:ZodSchema) {
-    return (req: Request, res:Response, next: NextFunction) => {
+export function validateQuery(schema: ZodType) {
+    return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.query)
 
         if (!result.success) {
@@ -27,7 +27,7 @@ export function validateQuery(schema:ZodSchema) {
     }
 }
 
-export function validateParams(schema: ZodSchema) {
+export function validateParams(schema: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req.params)
         if (!result.success) {

@@ -1,10 +1,10 @@
-import { Router } from 'express';
-import { register, login, refresh } from './auth.controller';
+import { googleLoginSchema } from './auth.schemas'
+import { Router } from 'express'
+import { validateBody } from '../middleware/validate'
+import { googleLoginController } from './auth.controller'
 
-const router = Router();
+const router = Router()
 
-router.post('/register', register);
-router.post('/login', login);
-router.post('/refresh', refresh);
+router.post('/google', validateBody(googleLoginSchema), googleLoginController);
 
 export default router;

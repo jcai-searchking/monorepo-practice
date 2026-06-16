@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateBody, validateParams, validateQuery } from '../middleware/validate';
-import { createUserSchema, userParamSchema } from './users.schemas';
+import { createUserSchema, userParamSchema, updateUserSchema } from './users.schemas';
 import * as UserController from './users.controller'
 
 const router = Router()
@@ -11,5 +11,10 @@ router.post('/', validateBody(createUserSchema), UserController.createUser)
 // Get User by ID
 router.get('/:id', validateParams(userParamSchema), UserController.getUser)
 
+// Update Partial User Data by ID
+router.patch('/:id', validateParams(userParamSchema), validateBody(updateUserSchema), UserController.updateUser)
+
+// Delete User by ID
+router.delete('/:id', validateParams(userParamSchema), UserController.deleteUser)
 
 export default router;

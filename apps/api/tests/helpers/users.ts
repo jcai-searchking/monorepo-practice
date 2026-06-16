@@ -4,7 +4,7 @@ let userCounter = 0
 
 export async function seedUser( data?: {
     name?:string,
-    age?:number,
+    birthDate?: Date,
     deletedAt?: Date | null,
     email?: string,
     passwordHash?: string,
@@ -12,11 +12,11 @@ export async function seedUser( data?: {
 
     return prisma.user.create({
         data: {
-            name: data?.name ?? 'Alice',
-            age: data?.age ?? 30, 
+            name: data?.name ?? 'Alison',
+            birthDate: data?.birthDate ?? new Date(),
             deletedAt: data?.deletedAt ?? null,
-            email: data?.email ?? `user${++userCounter}@sk.ca`,
-            passwordHash: data?.passwordHash ?? 'test-hash',
+            email: data?.email ?? `user${++userCounter}@app.ca`,
+            passwordHash: data?.passwordHash ?? 'hashedPassword',
         }
     })
 }

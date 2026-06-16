@@ -15,17 +15,19 @@ enum Role {
 
 // --- The People ---
 model User {
-  id            String        @id @default(cuid())
+  id            String        @id @default(uuid())
   email         String        @unique
-  passwordHash  String
+  passwordHash  String?
   name          String
-  birthDate     DateTime      @db.Date
+  birthDate     DateTime?     @db.Date
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime?
   refreshTokens RefreshToken[]
   role          Role          @default(PLAYER)
   lobbies       Lobby[]       @relation("HostedLobbies")
+  googleSub     String?       @unique
+  pictureUrl    String?       
 }
 
 // --- The Games ---
