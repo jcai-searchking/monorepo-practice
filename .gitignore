@@ -31,3 +31,6 @@ coverage/
 
 # Misc
 *.tgz
+
+# Local throwaway test scaffolding (never commit)
+scratch/
