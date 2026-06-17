@@ -1,7 +1,35 @@
 import { prisma } from '../prisma';
+import { Prisma } from '@prisma/client'
 import argon2 from 'argon2';
 import { CreateUserInput, UpdateUserInput, GoogleUserPayload } from './users.schemas';
 import { AppError } from '../errors/AppErrors';
+
+
+export const publicUserSelect = {
+    id: true,
+    name: true,
+    role: true,
+    createdAt: true,
+    pictureUrl: true,
+} satisfies Prisma.UserSelect;
+
+export const privateUserSelect = {
+    id: true,
+    email: true,
+    name: true,
+    birthDate: true,
+    role: true,
+    createdAt: true,
+    updatedAt: true,
+    pictureUrl: true,
+} satisfies Prisma.UserSelect;
+
+export const internalAuthUserSelect = {
+    id: true,
+    email: true,
+    googleSub: true,
+    deletedAt: true
+} satisfies Prisma.UserSelect;
 
 export const createUser = async (data: CreateUserInput) => {
     const existingUser = await prisma.user.findUnique({
@@ -22,28 +50,15 @@ export const createUser = async (data: CreateUserInput) => {
             birthDate: data.birthDate,
             role: data.role,
         },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            birthDate: true,
-            role: true,
-            createdAt: true,
-        },
+        select: privateUserSelect,
     });
 };
+
 
 export const getUserByIdService = async (id: string) => {
     const user = await prisma.user.findFirst({
         where: { id, deletedAt: null },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            birthDate: true,
-            role: true,
-            createdAt: true
-        }
+        select: publicUserSelect
     })
     if (!user) throw new AppError('User not found', 404)
     return user
@@ -68,14 +83,7 @@ export const updateUserService = async (id: string, updateData: UpdateUserInput)
             ...data,
             ...(passwordHash && { passwordHash }),
         },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            birthDate: true,
-            role: true,
-            createdAt: true,
-        },
+        select: privateUserSelect,
     });
 }
 
@@ -97,23 +105,14 @@ export const deleteUserService = async (id: string) => {
 export const findUserByGoogleSub = async (googleSub: string) => {
     return await prisma.user.findUnique({
         where: { googleSub },
-        select: {
-            id: true,
-            email: true,
-            googleSub: true,
-        }
+        select: privateUserSelect,
     })
 }
 
 export const findUserByEmail = async (email: string) => {
     return await prisma.user.findUnique({
         where: { email },
-        select: {
-            id: true,
-            email: true,
-            googleSub: true,
-            deletedAt: true,
-        }
+        select: internalAuthUserSelect
     })
 }
 
@@ -125,14 +124,7 @@ export const createGoogleUser = async (claims: GoogleUserPayload) => {
             googleSub: claims.sub,
             pictureUrl: claims.picture,
         },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
-            createdAt: true,
-            pictureUrl: true
-        },
+        select: privateUserSelect,
     })
 }
 
@@ -140,13 +132,6 @@ export const linkGoogleAccount = async (id: string, googleSub: string) => {
     return await prisma.user.update({
         where: { id },
         data: { googleSub },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
-            pictureUrl: true,
-            createdAt: true,
-        }
+        select: privateUserSelect,
     })
 }
