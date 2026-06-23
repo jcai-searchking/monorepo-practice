@@ -12,7 +12,7 @@ export async function googleLoginController(req: Request<{}, {}, GoogleLoginInpu
         const claims = await verifyGoogleToken(idToken)
         const user = await findOrCreateGoogleUser(claims)
         const accessToken = jwt.sign(
-            { sub: user.id },
+            { sub: user.id, role: user.role },
             ENV.JWT_SECRET,
             { expiresIn: '15m' }
         )
