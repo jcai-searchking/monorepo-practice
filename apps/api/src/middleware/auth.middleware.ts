@@ -27,7 +27,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 export function requireRole( ...allowedRoles: Role[]) {
         return (req: Request, res: Response, next: NextFunction) => {
             if (!req.user) {
-                throw new AppError('Missing Authorization', 401)
+                throw new AppError('Not Logged In', 401)
             }
             if (!allowedRoles.includes(req.user.role)) {
                 throw new AppError('Not Authorized', 403)

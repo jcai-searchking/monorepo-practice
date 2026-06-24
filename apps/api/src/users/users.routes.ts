@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { validateBody, validateParams, validateQuery } from '../middleware/validate';
 import { createUserSchema, userParamSchema, updateUserSchema } from './users.schemas';
 import * as UserController from './users.controller'
-import { requireAuth, requireAdmin } from '../middleware/auth.middleware'
+import { requireAuth, requireRole } from '../middleware/auth.middleware'
+import { Role } from '@prisma/client'
 
 const router = Router()
 
@@ -20,9 +21,9 @@ router.delete('/me', requireAuth, UserController.deleteUser)
 
 //Admin Only Routes
 // Update Partial User Data by ID
-router.patch('/:id', requireAuth, requireAdmin, validateParams(userParamSchema), validateBody(updateUserSchema), UserController.updateUserById)
+router.patch('/:id', requireAuth, requireRole(Role.ADMIN), validateParams(userParamSchema), validateBody(updateUserSchema), UserController.updateUserById)
 
 // Delete User by ID
-router.delete('/:id', requireAuth, requireAdmin, validateParams(userParamSchema), UserController.deleteUserById)
+router.delete('/:id', requireAuth, requireRole(Role.ADMIN), validateParams(userParamSchema), UserController.deleteUserById)
 
 export default router;

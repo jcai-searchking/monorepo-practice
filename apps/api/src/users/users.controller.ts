@@ -56,3 +56,30 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
         next(error)
     }
 }
+
+export const updateUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        
+        const { id } = req.validatedParams as UserParamInput
+        const updatedData = req.validatedBody  as UpdateUserInput
+        const updatedUser = await UserServices.updateUserService(id, updatedData) 
+        
+        res.status(200).json({ message:"User updated successfully", updatedUser })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const deleteUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.validatedParams as UserParamInput
+        const deletedUser = await UserServices.deleteUserService(id)
+        res.status(200).json({
+            success: true,
+            message: "User Successfully Deleted",
+            deletedUser
+        })
+    } catch (error) {
+        next(error)
+    }
+}
