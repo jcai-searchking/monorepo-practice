@@ -11,6 +11,17 @@ enum Role {
     HOST
     PLAYER
 }
+enum SkillLevel {
+  OPEN
+  INTERMEDIATE
+  INTERMEDIATE_PLUS
+}
+
+enum GenderFormat {
+  MENS
+  WOMENS
+  COED
+}
 
 
 // --- The People ---
@@ -32,14 +43,18 @@ model User {
 
 // --- The Games ---
 model Lobby {
-    id          String       @id @default(uuid())
-    title       String
-    location    String
-    date        DateTime
-    cost        Float
-
-    hostId      String
-    host        User         @relation("HostedLobbies", fields: [hostId], references: [id])
+  id            String        @id @default(uuid())
+  lobbyName     String
+  location      String
+  startTime     DateTime
+  endTime       DateTime
+  price         Float
+  skillLevel    SkillLevel
+  genderFormat  GenderFormat
+  allowToApply  Boolean
+  createdAt     DateTime      @default(now())
+  hostId        String
+  host          User          @relation("HostedLobbies", fields: [hostId], references: [id])
 }
 
 model RefreshToken {
