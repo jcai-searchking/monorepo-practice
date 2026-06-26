@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateBody, validateParams, validateQuery } from '../middleware/validate';
-import { createUserSchema, userParamSchema, updateUserSchema } from './users.schemas';
-import * as UserController from './users.controller'
+import { createUserSchema, userParamSchema, updateUserSchema } from './user.schemas';
+import * as UserController from './user.controller'
 import { requireAuth, requireRole } from '../middleware/auth.middleware'
 import { Role } from '@prisma/client'
 

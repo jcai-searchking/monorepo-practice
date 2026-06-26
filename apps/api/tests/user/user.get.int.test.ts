@@ -1,4 +1,4 @@
-import { getUserByIdService } from '../../src/users/users.services';
+import { getUserByIdService } from '../../src/user/user.services';
 import { prisma } from '../../src/prisma';
 import { Role } from '@prisma/client';
 import { describe, it, expect, beforeAll, afterAll, afterEach } from '@jest/globals';

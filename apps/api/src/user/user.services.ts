@@ -1,7 +1,7 @@
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client'
 import argon2 from 'argon2';
-import { CreateUserInput, UpdateUserInput, GoogleUserPayload } from './users.schemas';
+import { CreateUserInput, UpdateUserInput, GoogleUserPayload } from './user.schemas';
 import { AppError } from '../errors/AppErrors';
 
 

@@ -1,9 +1,9 @@
 import { OAuth2Client } from 'google-auth-library';
 import { ENV } from '../config/env';
 import { AppError } from '../errors/AppErrors';
-import { googleUserPayloadSchema } from '../users/users.schemas'
-import * as UserServices from '../users/users.services'
-import type { GoogleUserPayload } from '../users/users.schemas'
+import { googleUserPayloadSchema } from '../user/user.schemas'
+import * as UserServices from '../user/user.services'
+import type { GoogleUserPayload } from '../user/user.schemas'
 
 const client = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 

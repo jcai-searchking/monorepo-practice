@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import * as UserServices from './users.services';
-import { CreateUserInput, UserParamInput, UpdateUserInput } from './users.schemas'
+import * as UserServices from './user.services';
+import { CreateUserInput, UserParamInput, UpdateUserInput } from './user.schemas'
 import { AppError } from '../errors/AppErrors'
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {

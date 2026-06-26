@@ -1,4 +1,4 @@
-import { createUser } from '../../src/users/users.services';
+import { createUser } from '../../src/user/user.services';
 import { prisma } from '../../src/prisma';
 import argon2 from 'argon2';
 import { Role } from '@prisma/client'

@@ -1,7 +1,7 @@
-import { CreateLobbyInput } from "./lobbies.schemas";
+import { CreateLobbyInput } from "./lobby.schemas";
 import { prisma } from '../prisma';
 import { Prisma } from '@prisma/client'
-import { publicUserSelect } from "../users/users.services";
+import { publicUserSelect } from "../user/user.services";
 
 export const publicLobbySelect = {
     id: true,
