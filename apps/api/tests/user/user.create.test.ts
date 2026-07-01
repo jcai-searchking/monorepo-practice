@@ -51,6 +51,8 @@ describe('createUser', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
             deletedAt: null,
+            googleSub: null,
+            pictureUrl: null,
         };
         jest.mocked(prisma.user.findUnique).mockResolvedValueOnce(null); // "No duplicate found!"
         jest.mocked(argon2.hash).mockResolvedValue('fake_hashed_password'); // "Here is the hash!"

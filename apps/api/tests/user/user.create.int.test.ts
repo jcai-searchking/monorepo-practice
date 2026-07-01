@@ -50,7 +50,7 @@ describe('createUser Integration', () => {
         // It should NOT be plain text password
         expect(userInDb?.passwordHash).not.toBe(mockInput.password);
 
-        const isValid = await argon2.verify(userInDb!.passwordHash, mockInput.password)
+        const isValid = await argon2.verify(userInDb!.passwordHash!, mockInput.password)
         expect(isValid).toBe(true)
     })
 

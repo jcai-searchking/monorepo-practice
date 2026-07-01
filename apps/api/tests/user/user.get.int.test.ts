@@ -26,7 +26,7 @@ describe("getUserByIdService Integration", () => {
         const result = await getUserByIdService(testUser.id);
 
         expect(result.id).toBe(testUser.id)
-        expect(result.email).toBe(testUser.email)
+        expect(result).not.toHaveProperty('email')
         expect(result).not.toHaveProperty('passwordHash')
     })
 

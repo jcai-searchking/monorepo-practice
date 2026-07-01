@@ -3,6 +3,8 @@ import { beforeEach, afterEach, afterAll, describe, it, expect } from '@jest/glo
 import { app } from '../../src/app'
 import { resetDb, disconnectDb } from '../helpers/db';
 import { seedUser } from '../helpers/users';
+import { makeAuthHeader } from '../helpers/auth';
+import { Role } from '@prisma/client';
 import { prisma } from '../../src/prisma';
 import argon2 from 'argon2';
 
@@ -27,7 +29,10 @@ describe('PATCH /users/:id (Update User By ID)', ()=> {
         
         }
 
-        const res = await request(app).patch(`/users/${testUser.id}`).send(updateData)
+        const res = await request(app)
+            .patch(`/users/${testUser.id}`)
+            .set('Authorization', makeAuthHeader('admin', Role.ADMIN))
+            .send(updateData)
         expect(res.status).toBe(200)
         expect(res.body.updatedUser.name).toBe('New Alison')
     })
@@ -37,7 +42,10 @@ describe('PATCH /users/:id (Update User By ID)', ()=> {
         const updateData = { 
                 name: 'Gina'
         }
-        const res = await request(app).patch(`/users/${nonExistentId}`).send(updateData)
+        const res = await request(app)
+            .patch(`/users/${nonExistentId}`)
+            .set('Authorization', makeAuthHeader('admin', Role.ADMIN))
+            .send(updateData)
         expect(res.status).toBe(404)
         expect(res.body.error.message).toBe('User not found')
     })
@@ -47,7 +55,10 @@ describe('PATCH /users/:id (Update User By ID)', ()=> {
         const updateData = {
             email: 'allywong@gmail.com'
         }
-        const res = await request(app).patch(`/users/${id}`).send(updateData)
+        const res = await request(app)
+            .patch(`/users/${id}`)
+            .set('Authorization', makeAuthHeader('admin', Role.ADMIN))
+            .send(updateData)
         expect(res.status).toBe(400)
         expect(res.body.error.message).toBe("Invalid route parameters")
 
@@ -59,7 +70,10 @@ describe('PATCH /users/:id (Update User By ID)', ()=> {
             name: 12345 // Invalid type, should be string
         };
 
-        const res = await request(app).patch(`/users/${testUser.id}`).send(updateData);
+        const res = await request(app)
+            .patch(`/users/${testUser.id}`)
+            .set('Authorization', makeAuthHeader('admin', Role.ADMIN))
+            .send(updateData);
         expect(res.status).toBe(400);
         expect(res.body.error.message).toBe('Invalid request body');
     });
@@ -71,12 +85,15 @@ describe('PATCH /users/:id (Update User By ID)', ()=> {
             password: newPassword
         };
     
-        const res = await request(app).patch(`/users/${testUser.id}`).send(updateData);
+        const res = await request(app)
+            .patch(`/users/${testUser.id}`)
+            .set('Authorization', makeAuthHeader('admin', Role.ADMIN))
+            .send(updateData);
         expect(res.status).toBe(200);
     
         const updatedUserInDb = await prisma.user.findUnique({ where: { id: testUser.id } });
         expect(updatedUserInDb).not.toBeNull();
-        const isPasswordValid = await argon2.verify(updatedUserInDb!.passwordHash, newPassword);
+        const isPasswordValid = await argon2.verify(updatedUserInDb!.passwordHash!, newPassword);
         expect(isPasswordValid).toBe(true);
     });
 })

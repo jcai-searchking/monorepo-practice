@@ -6,7 +6,8 @@ import { resetDb, disconnectDb } from '../helpers/db'
 beforeEach(resetDb)
 afterAll(disconnectDb)
 
-describe('POST /auth/register', () => {
+// TODO: build email/password auth post-MVP (currently Google-only)
+describe.skip('POST /auth/register', () => {
     it('creates a user with a hashed password', async () => {
         const res = await request(app)
             .post('/auth/register')
