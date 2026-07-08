@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import authRoutes from './auth/auth.routes';
 import userRoutes from './user/user.routes';
@@ -12,6 +13,10 @@ import { errorHandler } from './middleware/errorHandler';
 export const app = express();
 
 // Global Middleware
+app.use(cors({
+    origin: 'http://localhost:4200',
+    credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
 

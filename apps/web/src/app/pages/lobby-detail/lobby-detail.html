@@ -1,0 +1,78 @@
+<section class="container detail">
+  <a routerLink="/" class="back-link">← Back to lobbies</a>
+
+  @if (loading()) {
+    <div class="panel skeleton"></div>
+  } @else if (notFound()) {
+    <div class="state">
+      <h2>Lobby not found</h2>
+      <p>This game may have ended or the link is incorrect.</p>
+      <a routerLink="/" class="btn btn-primary">Browse active lobbies</a>
+    </div>
+  } @else if (error()) {
+    <div class="state state-error">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (lobby(); as l) {
+    <article class="panel">
+      <header class="detail-head">
+        <div>
+          <h1>{{ l.lobbyName }}</h1>
+          <p class="location">{{ l.location }}</p>
+        </div>
+        <span class="price">
+          @if (l.price > 0) {
+            {{ l.price | currency: 'USD' : 'symbol' : '1.0-2' }}
+          } @else {
+            Free
+          }
+        </span>
+      </header>
+
+      <div class="badges">
+        <span class="badge badge-skill">{{ skillLabel }}</span>
+        <span class="badge badge-gender">{{ genderLabel }}</span>
+        @if (l.allowToApply) {
+          <span class="badge badge-open">Accepting players</span>
+        }
+      </div>
+
+      <dl class="facts">
+        <div class="fact">
+          <dt>Starts</dt>
+          <dd>{{ l.startTime | date: 'EEEE, MMM d · h:mm a' }}</dd>
+        </div>
+        <div class="fact">
+          <dt>Ends</dt>
+          <dd>{{ l.endTime | date: 'EEEE, MMM d · h:mm a' }}</dd>
+        </div>
+        <div class="fact">
+          <dt>Skill level</dt>
+          <dd>{{ skillLabel }}</dd>
+        </div>
+        <div class="fact">
+          <dt>Format</dt>
+          <dd>{{ genderLabel }}</dd>
+        </div>
+      </dl>
+
+      <footer class="host-block">
+        @if (l.host.pictureUrl) {
+          <img
+            class="host-avatar"
+            [src]="l.host.pictureUrl"
+            [alt]="l.host.name"
+          />
+        } @else {
+          <span class="host-avatar host-avatar-fallback">
+            {{ l.host.name.charAt(0) }}
+          </span>
+        }
+        <div>
+          <span class="host-label">Host</span>
+          <span class="host-name">{{ l.host.name }}</span>
+        </div>
+      </footer>
+    </article>
+  }
+</section>

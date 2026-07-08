@@ -1,0 +1,16 @@
+import { Routes } from '@angular/router';
+import { Home } from './pages/home/home';
+import { LobbyDetail } from './pages/lobby-detail/lobby-detail';
+import { Login } from './pages/login/login';
+import { Signup } from './pages/signup/signup';
+import { Profile } from './pages/profile/profile';
+import { authGuard } from './core/auth.guard';
+
+export const routes: Routes = [
+  { path: '', component: Home, title: 'Active Lobbies · Volleyball' },
+  { path: 'lobbies/:id', component: LobbyDetail, title: 'Lobby Details · Volleyball' },
+  { path: 'login', component: Login, title: 'Log in · Volleyball' },
+  { path: 'signup', component: Signup, title: 'Sign up · Volleyball' },
+  { path: 'profile', component: Profile, title: 'My Profile · Volleyball', canActivate: [authGuard] },
+  { path: '**', redirectTo: '' },
+];

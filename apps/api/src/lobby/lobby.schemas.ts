@@ -15,3 +15,9 @@ export const createLobbySchema = z.object({
 .refine((d) => d.startTime > new Date(), { message: "Start time cannot be in the past", path: ["startTime"] })
 
 export type CreateLobbyInput = z.infer<typeof createLobbySchema>
+
+export const lobbyParamSchema = z.object({
+    id: z.string().trim().pipe(z.uuid('Invalid lobby ID format')),
+})
+
+export type LobbyParamInput = z.infer<typeof lobbyParamSchema>

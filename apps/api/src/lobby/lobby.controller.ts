@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from '../errors/AppErrors'
-import { CreateLobbyInput } from './lobby.schemas'
+import { CreateLobbyInput, LobbyParamInput } from './lobby.schemas'
 import * as LobbyServices from './lobby.services'
 
 export const createLobby = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,6 +11,25 @@ export const createLobby = async (req: Request, res: Response, next: NextFunctio
         const lobbydata = req.validatedBody as CreateLobbyInput
         const lobby = await LobbyServices.createLobbyService(lobbydata, req.user.id)
         return res.status(201).json({message: "Lobby created successfully", lobby})
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const listLobbies = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        const lobbies = await LobbyServices.listActiveLobbiesService()
+        return res.status(200).json({ success: true, lobbies })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getLobby = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.validatedParams as LobbyParamInput
+        const lobby = await LobbyServices.getLobbyByIdService(id)
+        return res.status(200).json({ success: true, lobby })
     } catch (error) {
         next(error)
     }
