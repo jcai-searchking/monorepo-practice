@@ -12,11 +12,7 @@ export const createUserSchema = z.object({
         .regex(/[^a-zA-Z0-9]/, 'Password must contain at least 1 special character'),
     name: z.string().trim(),
     birthDate: z.coerce.date(),
-    role: z
-        .enum([Role.ADMIN, Role.HOST, Role.PLAYER])
-        .optional()
-        .default(Role.PLAYER),
-});
+}).strict();
 
 export const userParamSchema = z.object({
     id: z.string().trim().pipe(z.uuid('Invalid user ID format')),

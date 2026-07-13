@@ -4,6 +4,7 @@ import { AppError } from '../errors/AppErrors';
 import { googleUserPayloadSchema } from '../user/user.schemas'
 import * as UserServices from '../user/user.services'
 import type { GoogleUserPayload } from '../user/user.schemas'
+import argon2 from 'argon2'
 
 const client = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
@@ -56,3 +57,16 @@ export const findOrCreateGoogleUser = async (claims: GoogleUserPayload) => {
     return UserServices.createGoogleUser(claims)
 } 
 
+export const loginService = async (email: string, password: string) => {
+    const user = await UserServices.findUserForLogin(email)
+
+    if (!user || user.passwordHash === null) {
+        throw new AppError('Incorrect Login Credentials', 401)
+    }
+
+    const correctPassword = await argon2.verify(user.passwordHash, password)
+    if (!correctPassword) throw new AppError ('Incorrect Login Credentials', 401)
+
+    const { passwordHash, ...safeUser} = user
+    return safeUser
+}

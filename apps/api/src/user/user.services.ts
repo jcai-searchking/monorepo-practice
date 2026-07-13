@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import { Prisma } from '@prisma/client'
+import { Prisma, Role } from '@prisma/client'
 import argon2 from 'argon2';
 import { CreateUserInput, UpdateUserInput, GoogleUserPayload } from './user.schemas';
 import { AppError } from '../errors/AppErrors';
@@ -24,12 +24,21 @@ export const privateUserSelect = {
     pictureUrl: true,
 } satisfies Prisma.UserSelect;
 
-export const internalAuthUserSelect = {
+export const googleAuthUserSelect = {
     id: true,
     email: true,
     googleSub: true,
-    deletedAt: true
+    deletedAt: true,
 } satisfies Prisma.UserSelect;
+
+export const loginAuthUserSelect = {
+    id: true,
+    email: true,
+    name: true,
+    createdAt: true,
+    role: true,
+    passwordHash: true,
+} satisfies Prisma.UserSelect
 
 export const createUser = async (data: CreateUserInput) => {
     const existingUser = await prisma.user.findUnique({
@@ -48,7 +57,7 @@ export const createUser = async (data: CreateUserInput) => {
             passwordHash,
             name: data.name,
             birthDate: data.birthDate,
-            role: data.role,
+            role: Role.PLAYER,
         },
         select: privateUserSelect,
     });
@@ -112,7 +121,7 @@ export const findUserByGoogleSub = async (googleSub: string) => {
 export const findUserByEmail = async (email: string) => {
     return await prisma.user.findUnique({
         where: { email },
-        select: internalAuthUserSelect
+        select: googleAuthUserSelect
     })
 }
 
@@ -133,5 +142,12 @@ export const linkGoogleAccount = async (id: string, googleSub: string) => {
         where: { id },
         data: { googleSub },
         select: privateUserSelect,
+    })
+}
+
+export const findUserForLogin = async (email: string) => {
+    return await prisma.user.findFirst({
+        where: { email, deletedAt: null }, 
+        select: loginAuthUserSelect
     })
 }

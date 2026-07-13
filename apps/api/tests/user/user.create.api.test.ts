@@ -23,7 +23,6 @@ describe('POST /users (Create User API)', () => {
             password: 'Password123!',
             name: 'API Test User',
             birthDate: '1995-01-01',
-            role: Role.PLAYER,
         };
 
         // fire a fake HTTP request at your Express App
@@ -62,6 +61,22 @@ describe('POST /users (Create User API)', () => {
             password: 'Password123!',
             name: 'noEmail User',
             birthDate: '2005-04-25',
+        };
+        const response = await request(app)
+            .post('/users')
+            .send(badPayload);
+    
+        expect(response.status).toBe(400);
+        expect(response.body.error.message).toBe('Invalid request body');
+    });
+
+        it('Unhappy Path: should return 400 if Request Body does not match schema', async () => {
+        const badPayload = {
+            email: 'sneaky@gmail.com',
+            password: 'Password123!',
+            name: 'Sneaky User',
+            birthDate: '2005-04-25',
+            role: Role.ADMIN,
         };
         const response = await request(app)
             .post('/users')

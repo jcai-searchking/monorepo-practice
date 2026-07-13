@@ -26,7 +26,6 @@ describe('createUser Integration', () => {
             password: 'SecuredPassword123!',
             name: 'Real DB User',
             birthDate: new Date('1995-05-20'),
-            role: Role.PLAYER,
         }
 
         // -- ACT --
@@ -45,6 +44,7 @@ describe('createUser Integration', () => {
 
         expect(userInDb).not.toBeNull();
         expect(userInDb?.name).toBe('Real DB User')
+        expect(userInDb?.role).toBe(Role.PLAYER)
 
         // 3.Verify that the password was hashed correctly in the DB
         // It should NOT be plain text password
@@ -60,7 +60,6 @@ describe('createUser Integration', () => {
             password: 'Password123!',
             name: 'User 1',
             birthDate: new Date('2001-01-01'),
-            role: Role.PLAYER,
         }
 
         const duplicateEmail = {
@@ -68,7 +67,6 @@ describe('createUser Integration', () => {
             password: 'Password123!',
             name: 'User 2',
             birthDate: new Date('2002-01-02'),
-            role: Role.PLAYER,
         }
 
         await createUser(mockInput)
