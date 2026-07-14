@@ -4,12 +4,10 @@ import { resetDb, disconnectDb } from '../helpers/db'
 import { seedUser } from '../helpers/users'
 import argon2 from 'argon2'
 import type { User } from '@prisma/client'
-import { describe, it, expect, beforeAll, afterAll, afterEach } from '@jest/globals'
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
 
 
 let megan: User
-let sam: User
-let sabrina: User
 beforeAll(async ()=> {
     await resetDb()
     const passwordHash = await argon2.hash('password123')
@@ -17,17 +15,6 @@ beforeAll(async ()=> {
         name: 'Megan Goodman',
         email: 'testuser@sk.ca',
         passwordHash,
-    })
-    sam = await seedUser({
-        name: 'Samantha Inactive',
-        email: 'inactiveuser@sk.ca',
-        passwordHash,
-        deletedAt: new Date()
-    })
-    sabrina = await seedUser({ 
-        name: 'Sabrina google',
-        email: 'googleuser@gmail.com', 
-        passwordHash: null
     })
 })
 afterAll(disconnectDb)
@@ -77,6 +64,11 @@ describe('POST /auth/login', () => {
     })
 
     it('existing user but inactive', async () => {
+        await seedUser({
+        name: 'Samantha Inactive',
+        email: 'inactiveuser@sk.ca',
+        deletedAt: new Date()
+        })
         const res = await request(app)
             .post('/auth/login')
             .send({
@@ -87,6 +79,11 @@ describe('POST /auth/login', () => {
     })
 
     it('Google-only account cannot login with a password', async ()=> {
+        await seedUser({ 
+        name: 'Sabrina google',
+        email: 'googleuser@gmail.com', 
+        passwordHash: null
+    })
         const res = await request(app).post('/auth/login')
         .send({
             email:'googleuser@gmail.com',
