@@ -4,30 +4,36 @@ import { resetDb, disconnectDb } from '../helpers/db'
 import { seedUser } from '../helpers/users'
 import argon2 from 'argon2'
 import type { User } from '@prisma/client'
+import { describe, it, expect, beforeAll, afterAll, afterEach } from '@jest/globals'
 
 
 let megan: User
 let sam: User
-beforeEach(async ()=> {
+let sabrina: User
+beforeAll(async ()=> {
     await resetDb()
     const passwordHash = await argon2.hash('password123')
     megan = await seedUser({
-        name: 'Megan',
+        name: 'Megan Goodman',
         email: 'testuser@sk.ca',
         passwordHash,
     })
     sam = await seedUser({
-        name: 'Samantha',
+        name: 'Samantha Inactive',
         email: 'inactiveuser@sk.ca',
         passwordHash,
         deletedAt: new Date()
+    })
+    sabrina = await seedUser({ 
+        name: 'Sabrina google',
+        email: 'googleuser@gmail.com', 
+        passwordHash: null
     })
 })
 afterAll(disconnectDb)
 
 
-// TODO: build email/password auth post-MVP (currently Google-only)
-describe.skip('POST /auth/login', () => {
+describe('POST /auth/login', () => {
     it('Login with correct credentials', async () => {
         const res = await request(app)
             .post('/auth/login')
@@ -37,8 +43,8 @@ describe.skip('POST /auth/login', () => {
             })
         expect(res.status).toBe(200)
         
-        expect(res.body.user).toHaveProperty('accessToken')
-        expect(typeof res.body.user.accessToken).toBe('string')
+        expect(res.body).toHaveProperty('accessToken')
+        expect(typeof res.body.accessToken).toBe('string')
 
         expect(res.body.user).not.toHaveProperty('password')
         expect(res.body.user).not.toHaveProperty('passwordHash')
@@ -56,7 +62,7 @@ describe.skip('POST /auth/login', () => {
                 password: 'wrongpassword',
             })
         expect(res.status).toBe(401)
-        expect(res.body.error.message).toBe('Invalid credentials')
+        expect(res.body.error.message).toBe('Incorrect Login Credentials')
     })
 
     it('non existing user', async() => {
@@ -67,7 +73,7 @@ describe.skip('POST /auth/login', () => {
                 password: 'password123',
             })
         expect(res.status).toBe(401)
-        expect(res.body.error.message).toBe('Invalid credentials')
+        expect(res.body.error.message).toBe('Incorrect Login Credentials')
     })
 
     it('existing user but inactive', async () => {
@@ -78,6 +84,16 @@ describe.skip('POST /auth/login', () => {
                 password: 'password123',
             })
        expect(res.status).toBe(401)
+    })
+
+    it('Google-only account cannot login with a password', async ()=> {
+        const res = await request(app).post('/auth/login')
+        .send({
+            email:'googleuser@gmail.com',
+            password: 'anyPassword1',
+        })
+        expect(res.status).toBe(401)
+        expect(res.body.error.message).toBe('Incorrect Login Credentials')
     })
 
 })
