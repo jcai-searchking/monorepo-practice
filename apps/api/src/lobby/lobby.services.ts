@@ -1,8 +1,9 @@
 import { CreateLobbyInput } from "./lobby.schemas";
 import { prisma } from '../prisma';
-import { Prisma } from '@prisma/client'
+import { Prisma, Role } from '@prisma/client'
 import { publicUserSelect } from "../user/user.services";
 import { AppError } from '../errors/AppErrors';
+
 
 export const publicLobbySelect = {
     id: true,
@@ -41,4 +42,23 @@ export const getLobbyByIdService = async (id: string) => {
     })
     if (!lobby) throw new AppError('Lobby not found', 404)
     return lobby
+}
+
+export const deleteLobbyService = async (id: string, userId: string, role: Role) => {
+    const lobby = await prisma.lobby.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            hostId : true
+        }
+    })
+    
+    if (!lobby) throw new AppError('Lobby not found', 404)
+    if (lobby.hostId !== userId && role !== Role.ADMIN ) throw new AppError('Access Denied', 403)
+
+    const deleteLobby = await prisma.lobby.delete({
+        where: { id },
+    })
+    return deleteLobby
+
 }

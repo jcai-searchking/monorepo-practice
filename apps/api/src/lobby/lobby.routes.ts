@@ -1,6 +1,6 @@
 import express from 'express'
 import { Router } from 'express'
-import { createLobby } from './lobby.controller'
+import { createLobby, deleteLobby } from './lobby.controller'
 import { createLobbySchema, lobbyParamSchema } from './lobby.schemas'
 import { requireAuth, requireRole } from '../middleware/auth.middleware'
 import { Role } from '@prisma/client'
@@ -16,5 +16,6 @@ router.get('/:id', validateParams(lobbyParamSchema), LobbyController.getLobby)
 
 router.post('/', requireAuth, requireRole(Role.HOST, Role.ADMIN), validateBody(createLobbySchema), LobbyController.createLobby)
 
+router.delete('/:id', requireAuth, requireRole(Role.HOST, Role.ADMIN), validateParams(lobbyParamSchema), LobbyController.deleteLobby)
 
 export default router

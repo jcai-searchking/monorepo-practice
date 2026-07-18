@@ -34,3 +34,17 @@ export const getLobby = async (req: Request, res: Response, next: NextFunction) 
         next(error)
     }
 }
+
+export const deleteLobby = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) {
+            return next(new AppError('Authentication required', 401))
+        }
+        const { id: lobbyId } = req.validatedParams as LobbyParamInput
+        const { id: userId, role } = req.user 
+        await LobbyServices.deleteLobbyService(lobbyId, userId, role)
+        return res.status(204).send()
+    } catch (error) {
+        next(error)
+    }
+}
