@@ -1,4 +1,4 @@
-import { CreateLobbyInput } from "./lobby.schemas";
+import { CreateLobbyInput, UpdateLobbyInput } from "./lobby.schemas";
 import { prisma } from '../prisma';
 import { Prisma, Role } from '@prisma/client'
 import { publicUserSelect } from "../user/user.services";
@@ -42,6 +42,25 @@ export const getLobbyByIdService = async (id: string) => {
     })
     if (!lobby) throw new AppError('Lobby not found', 404)
     return lobby
+}
+
+export const updateLobbyService = async (id: string, userId: string, role: Role, data: UpdateLobbyInput) => {
+    const lobby = await prisma.lobby.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            hostId: true
+        }
+    })
+
+    if (!lobby) throw new AppError('Lobby not found', 404)
+    if (lobby.hostId !== userId && role !== Role.ADMIN) throw new AppError('Access Denied', 403)
+    return prisma.lobby.update({
+        where: { id },
+        data,
+        select: publicLobbySelect
+    })
+    
 }
 
 export const deleteLobbyService = async (id: string, userId: string, role: Role) => {

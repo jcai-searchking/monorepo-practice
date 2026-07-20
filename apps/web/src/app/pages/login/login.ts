@@ -57,7 +57,7 @@ export class Login {
         if (err.status === 401) {
           this.serverError.set('Incorrect email or password.');
         } else {
-          this.serverError.set('Something went wrong. Is the API running?');
+          this.serverError.set('Something went wrong. Please try again later.');
         }
       },
     });

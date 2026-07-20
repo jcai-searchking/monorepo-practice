@@ -77,7 +77,7 @@ export class Signup {
         } else if (err.status === 400) {
           this.serverError.set('Please check your details and try again.');
         } else {
-          this.serverError.set('Something went wrong. Is the API running?');
+          this.serverError.set('Something went wrong. Please try again later.');
         }
       },
     });

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { AppError } from '../errors/AppErrors'
-import { CreateLobbyInput, LobbyParamInput } from './lobby.schemas'
+import { CreateLobbyInput, LobbyParamInput, UpdateLobbyInput } from './lobby.schemas'
 import * as LobbyServices from './lobby.services'
 
 export const createLobby = async (req: Request, res: Response, next: NextFunction) => {
@@ -35,6 +35,20 @@ export const getLobby = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
+export const updateLobby = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) return next(new AppError('Authentication required', 401))
+        const { id: lobbyId } = req.validatedParams as LobbyParamInput
+        const { id: userId, role } = req.user
+        const data = req.validatedBody as UpdateLobbyInput
+
+        const lobby = await LobbyServices.updateLobbyService(lobbyId, userId, role, data) 
+        return res.status(200).json({ message: "Lobby updated", lobby })
+    } catch (error) {
+        next(error)
+    }
+}
+ 
 export const deleteLobby = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.user) {
