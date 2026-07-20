@@ -54,12 +54,7 @@ export class Login {
       },
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
-        if (err.status === 404) {
-          // The POST /auth/login endpoint doesn't exist yet — guide the user.
-          this.serverError.set(
-            "Email/password login isn't built on the backend yet. Use Google for now, or build POST /auth/login as your next slice."
-          );
-        } else if (err.status === 401) {
+        if (err.status === 401) {
           this.serverError.set('Incorrect email or password.');
         } else {
           this.serverError.set('Something went wrong. Is the API running?');

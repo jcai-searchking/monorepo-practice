@@ -6,12 +6,20 @@ import {
   Lobby,
   LobbyDetailResponse,
   LobbyListResponse,
+  CreateLobbyRequest,
 } from '../models/lobby';
 
 @Injectable({ providedIn: 'root' })
 export class LobbyService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/lobbies`;
+
+  /** POST /lobbies - HOST/ADMIN only (enforced by backend) */
+  createLobby(data: CreateLobbyRequest) : Observable<Lobby> {
+    return this.http
+      .post<{ message: string; lobby: Lobby }>(this.baseUrl, data)
+      .pipe(map((res) => res.lobby))
+  }
 
   /** GET /lobbies — active lobbies (endTime in the future), soonest first. */
   listLobbies(): Observable<Lobby[]> {
@@ -25,5 +33,10 @@ export class LobbyService {
     return this.http
       .get<LobbyDetailResponse>(`${this.baseUrl}/${id}`)
       .pipe(map((res) => res.lobby));
+  }
+  
+  /** DELETE /lobbies/:id - owner or admin only (enforced by backend) */
+  deleteLobby(id:string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

@@ -3,7 +3,7 @@ import { SkillLevel } from '@prisma/client'
 import { GenderFormat} from '@prisma/client'
 
 export const createLobbySchema = z.object({
-    lobbyName: z.string().trim().min(3).max(30),
+    lobbyName: z.string().trim().min(3).max(35),
     location: z.string().trim().min(3),
     startTime: z.coerce.date(),
     endTime: z.coerce.date(),

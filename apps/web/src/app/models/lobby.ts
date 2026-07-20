@@ -38,6 +38,17 @@ export interface LobbyDetailResponse {
   lobby: Lobby;
 }
 
+export interface CreateLobbyRequest {
+  lobbyName: string;
+  location: string;
+  startTime: string;   // ISO-ish string; backend coerces to Date
+  endTime: string;
+  price: number;
+  skillLevel: SkillLevel;
+  genderFormat: GenderFormat;
+  allowToApply: boolean;
+}
+
 export const SKILL_LABELS: Record<SkillLevel, string> = {
   OPEN: 'Open',
   INTERMEDIATE: 'Intermediate',

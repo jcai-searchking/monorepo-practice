@@ -16,11 +16,6 @@
 
     <div class="divider"><span>or with email</span></div>
 
-    <div class="notice notice-info">
-      Heads up: email/password login needs a <code>POST /auth/login</code>
-      endpoint that isn't built yet. Google sign-in works now.
-    </div>
-
     @if (serverError()) {
       <div class="notice notice-error" role="alert">{{ serverError() }}</div>
     }

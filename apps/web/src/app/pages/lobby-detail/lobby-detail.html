@@ -73,6 +73,12 @@
           <span class="host-name">{{ l.host.name }}</span>
         </div>
       </footer>
+      @if (canDelete()) {
+        <button type="button" class="btn btn-danger" (click)="deleteLobby()" [disabled]="deleting()">
+          {{deleting() ? 'Deleting...' : "Delete Lobby"}}
+        </button>
+        @if (deleteError()) { <p class="field-error"> {{ deleteError() }}</p> }
+      }
     </article>
   }
 </section>
