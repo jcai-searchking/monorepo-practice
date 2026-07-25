@@ -60,3 +60,5 @@ export const GENDER_LABELS: Record<GenderFormat, string> = {
   WOMENS: "Women's",
   COED: 'Co-ed',
 };
+
+export type UpdateLobbyRequest = Partial<CreateLobbyRequest>;

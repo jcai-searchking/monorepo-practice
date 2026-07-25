@@ -7,6 +7,7 @@ import {
   LobbyDetailResponse,
   LobbyListResponse,
   CreateLobbyRequest,
+  UpdateLobbyRequest,
 } from '../models/lobby';
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +36,12 @@ export class LobbyService {
       .pipe(map((res) => res.lobby));
   }
   
+  updateLobby(id: string, data: UpdateLobbyRequest): Observable<Lobby> {
+  return this.http
+    .patch<{ message: string; lobby: Lobby }>(`${this.baseUrl}/${id}`, data)
+    .pipe(map((res) => res.lobby));
+  }
+
   /** DELETE /lobbies/:id - owner or admin only (enforced by backend) */
   deleteLobby(id:string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);

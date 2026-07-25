@@ -73,12 +73,15 @@
           <span class="host-name">{{ l.host.name }}</span>
         </div>
       </footer>
-      @if (canDelete()) {
-        <button type="button" class="btn btn-danger" (click)="deleteLobby()" [disabled]="deleting()">
-          {{deleting() ? 'Deleting...' : "Delete Lobby"}}
-        </button>
-        @if (deleteError()) { <p class="field-error"> {{ deleteError() }}</p> }
-      }
+      <footer class="action-bar">
+        @if (canDelete()) {
+          <a [routerLink]="['/lobbies', lobby()?.id, 'edit']" class="btn btn-primary">Edit</a>
+          <button type="button" class="btn btn-danger" (click)="deleteLobby()" [disabled]="deleting()">
+            {{deleting() ? 'Deleting...' : "Delete Lobby"}}
+          </button>
+          @if (deleteError()) { <p class="field-error"> {{ deleteError() }}</p> }
+        }
+      </footer>
     </article>
   }
 </section>
