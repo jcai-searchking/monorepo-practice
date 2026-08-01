@@ -19,17 +19,23 @@
 
       <div class="field">
         <label for="startTime">Start time</label>
-        <input id="startTime" type="datetime-local" class="input" formControlName="startTime" />
+        <app-datetime-picker formControlName="startTime" />
       </div>
 
       <div class="field">
         <label for="endTime">End time</label>
-        <input id="endTime" type="datetime-local" class="input" formControlName="endTime" />
+        <app-datetime-picker formControlName="endTime" />
       </div>
 
       <div class="field">
         <label for="price">Price (USD)</label>
         <input id="price" type="number" min="0" class="input" formControlName="price" />
+      </div>
+
+      <div class="field">
+        <label for="capacity">Roster cap</label>
+        <input id="capacity" type="number" min="0" class="input" formControlName="capacity" />
+        <p class="field-hint">Max players on the roster. Use 0 for no limit — extras join a waitlist.</p>
       </div>
 
       <div class="field">

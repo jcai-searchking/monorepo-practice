@@ -286,6 +286,12 @@ a {
   font-size: 0.85rem;
 }
 
+.field-hint {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+
 .rules {
   list-style: none;
   padding: 0;

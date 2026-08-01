@@ -23,6 +23,8 @@ export interface Lobby {
   skillLevel: SkillLevel;
   genderFormat: GenderFormat;
   allowToApply: boolean;
+  // Max players on the active roster; null means no cap (unlimited).
+  capacity: number | null;
   createdAt: string;
   host: PublicUser;
 }
@@ -47,6 +49,7 @@ export interface CreateLobbyRequest {
   skillLevel: SkillLevel;
   genderFormat: GenderFormat;
   allowToApply: boolean;
+  capacity: number | null;
 }
 
 export const SKILL_LABELS: Record<SkillLevel, string> = {
@@ -62,3 +65,49 @@ export const GENDER_LABELS: Record<GenderFormat, string> = {
 };
 
 export type UpdateLobbyRequest = Partial<CreateLobbyRequest>;
+
+// ---- Lobby players ----
+
+// The trimmed user shape the backend attaches to a player via `include.user`.
+export interface LobbyPlayerUser {
+  id: string;
+  name: string;
+  pictureUrl: string | null;
+}
+
+// Mirrors a LobbyPlayer row. Guests have userId/user null and a guestName.
+export interface LobbyPlayer {
+  id: string;
+  lobbyId: string;
+  userId: string | null;
+  guestName: string | null;
+  position: string;
+  approved: boolean;
+  paid: boolean;
+  joinedAt: string;
+  user: LobbyPlayerUser | null;
+}
+
+// POST /lobbies/:lobbyId/players — provide either userId or guestName.
+export interface AddPlayerRequest {
+  userId?: string;
+  guestName?: string;
+  position?: string;
+}
+
+// PATCH /lobbies/:lobbyId/players/:playerId — all optional.
+export interface UpdatePlayerRequest {
+  approved?: boolean;
+  paid?: boolean;
+  position?: string;
+}
+
+export interface LobbyPlayerListResponse {
+  success: boolean;
+  players: LobbyPlayer[];
+}
+
+export interface LobbyPlayerResponse {
+  message: string;
+  player: LobbyPlayer;
+}

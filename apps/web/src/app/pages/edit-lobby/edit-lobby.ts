@@ -3,8 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LobbyService } from '../../services/lobby.service';
-import { GENDER_LABELS, SKILL_LABELS, UpdateLobbyRequest } from '../../models/lobby';
-
+import { GENDER_LABELS, GenderFormat, SkillLevel, SKILL_LABELS, UpdateLobbyRequest } from '../../models/lobby';
+import { DatetimePicker } from '../../shared/datetime-picker/datetime-picker';
 /**
  * Converts an ISO string (e.g. "2026-07-26T19:11:00.000Z") to the format
  * that <input type="datetime-local"> expects: "2026-07-26T19:11"
@@ -18,7 +18,7 @@ function toDatetimeLocal(iso: string): string {
 
 @Component({
   selector: 'app-edit-lobby',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DatetimePicker],
   templateUrl: './edit-lobby.html',
   styleUrl: './edit-lobby.css',
 })
@@ -42,9 +42,10 @@ export class EditLobby implements OnInit {
     startTime: ['', [Validators.required]],
     endTime: ['', [Validators.required]],
     price: [0, [Validators.required, Validators.min(0)]],
-    skillLevel: ['OPEN', [Validators.required]],
-    genderFormat: ['COED', [Validators.required]],
+    skillLevel: ['OPEN' as SkillLevel, [Validators.required]],
+    genderFormat: ['COED' as GenderFormat, [Validators.required]],
     allowToApply: [true],
+    capacity: [0, [Validators.min(0)]],
   });
 
   ngOnInit(): void {
@@ -67,6 +68,7 @@ export class EditLobby implements OnInit {
           skillLevel: lobby.skillLevel,
           genderFormat: lobby.genderFormat,
           allowToApply: lobby.allowToApply,
+          capacity: lobby.capacity ?? 0,
         });
         this.loading.set(false);
       },
@@ -92,7 +94,12 @@ export class EditLobby implements OnInit {
     if (!id) return;
 
     this.submitting.set(true);
-    this.lobbyService.updateLobby(id, this.form.getRawValue() as UpdateLobbyRequest).subscribe({
+    const raw = this.form.getRawValue();
+    const payload: UpdateLobbyRequest = {
+      ...raw,
+      capacity: raw.capacity > 0 ? raw.capacity : null,
+    };
+    this.lobbyService.updateLobby(id, payload).subscribe({
       next: (lobby) => this.router.navigate(['/lobbies', lobby.id]),
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);

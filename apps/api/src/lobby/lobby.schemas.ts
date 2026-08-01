@@ -12,7 +12,7 @@ const lobbyBaseSchema = z.object({
     genderFormat: z.enum(GenderFormat),
     allowToApply: z.boolean()
 })
-
+ 
 export const createLobbySchema = lobbyBaseSchema
     .refine((d) => d.endTime > d.startTime, { message: 'End time must be after start time', path: ["endTime"] })
     .refine((d) => d.startTime > new Date(), { message: "Start time cannot be in the past", path: ["startTime"] })
