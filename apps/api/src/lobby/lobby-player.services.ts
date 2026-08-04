@@ -1,18 +1,34 @@
 import { prisma } from '../prisma';                                 
 import { AppError } from '../errors/AppErrors';
 import { AddPlayerInput, UpdatePlayerInput } from "./lobby-player.schemas"
+import { Role } from '@prisma/client'
+import { AuthUser } from './../types/auth'
 
-
-export const addLobbyPlayerService = async (playerInput: AddPlayerInput, lobbyId: string, hostId: string) => {
+const assertLobbyManager = async (lobbyId: string, actor:AuthUser) => {
     const lobby = await prisma.lobby.findUnique({
-        where: { id: lobbyId},
-        select: { id: true,
-                hostId : true }
+        where: { id: lobbyId },
+        select: {
+            hostId: true,
+        }
     })
 
     if (!lobby) throw new AppError("Lobby not found", 404)
-    
-    if (lobby.hostId !== hostId ) throw new AppError("Forbidden", 403)
+    const isManager = ( lobby.hostId === actor.id || actor.role === Role.ADMIN )
+    if (!isManager) throw new AppError("Forbidden", 403)
+
+}
+
+const assertPlayerInLobby = async (playerId:string, lobbyId:string) => {
+    const player = await prisma.lobbyPlayer.findUnique({
+        where: { id: playerId},
+        select: { lobbyId: true}
+    })
+    if (!player || player.lobbyId !== lobbyId) throw new AppError("Player not found", 404)
+}
+
+export const addLobbyPlayerService = async (playerInput: AddPlayerInput, lobbyId: string, actor: AuthUser) => {
+    await assertLobbyManager(lobbyId, actor)
+
     return prisma.lobbyPlayer.create({
         data: {
             lobbyId,
@@ -39,25 +55,23 @@ export const getLobbyPlayersService = async (lobbyId: string) => {
      })
 }
 
-export const updateLobbyPlayerService = async (playerId: string, lobbyId:string, hostId:string, data: UpdatePlayerInput) => {
-    const lobby = await prisma.lobby.findUnique({
-        where: {id: lobbyId},
-        select: {hostId: true , players:true}
-    })
+export const updateLobbyPlayerService = async (playerId: string, lobbyId:string, actor:AuthUser, data: UpdatePlayerInput) => {
+    await assertLobbyManager(lobbyId, actor)
+    await assertPlayerInLobby(playerId, lobbyId)
 
-    const player = await prisma.lobbyPlayer.findUnique({
-        where: { id: playerId },
-        select: { lobbyId: true}
-    })
-
-    if ( !lobby ) throw new AppError('does not exist', 404)
-    if ( !player || player.lobbyId != lobbyId ) throw new AppError('Player not found', 404)
-    
     return prisma.lobbyPlayer.update({
         where: { id: playerId },
         data,
         include: {
             user: { select: { id: true, name: true, pictureUrl: true } }
         }
+    })
+}
+
+export const deleteLobbyPlayerService = async (playerId: string, lobbyId: string, actor:AuthUser ) => {
+    await assertLobbyManager(lobbyId, actor)
+    await assertPlayerInLobby(playerId, lobbyId)
+    return prisma.lobbyPlayer.delete({
+        where: { id: playerId }
     })
 }

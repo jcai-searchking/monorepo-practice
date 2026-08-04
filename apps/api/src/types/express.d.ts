@@ -1,17 +1,13 @@
-import { z } from 'zod'
 import 'express'
-import { Role } from '@prisma/client'
-
+import type { AuthUser } from './auth'
 declare global {
     namespace Express {
         interface Request {
-            user?: {
-                id: string,
-                role: Role 
-            }
+            user?: AuthUser
             validatedBody?: unknown
             validatedQuery?: unknown
             validatedParams?: unknown
         }
     }
 }
+

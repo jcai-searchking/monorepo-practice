@@ -68,8 +68,8 @@ model LobbyPlayer {
   paid      Boolean  @default(false)
   joinedAt  DateTime @default(now())
 
-  lobby Lobby @relation(fields: [lobbyId], references: [id], onDelete: Cascade)
-  user  User? @relation(fields: [userId], references: [id])
+  lobby     Lobby    @relation(fields: [lobbyId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@unique([lobbyId, userId])
   @@index([lobbyId])
