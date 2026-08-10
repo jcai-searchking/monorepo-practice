@@ -26,7 +26,7 @@ const assertPlayerInLobby = async (playerId:string, lobbyId:string) => {
     if (!player || player.lobbyId !== lobbyId) throw new AppError("Player not found", 404)
 }
 
-export const addLobbyPlayerService = async (playerInput: AddPlayerInput, lobbyId: string, actor: AuthUser) => {
+export const addLobbyPlayerService = async (lobbyId: string, actor: AuthUser,playerInput: AddPlayerInput, ) => {
     await assertLobbyManager(lobbyId, actor)
 
     return prisma.lobbyPlayer.create({
