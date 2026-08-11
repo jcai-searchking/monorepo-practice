@@ -27,3 +27,15 @@ export const listPlayers =  async (req: Request, res:Response, next: NextFunctio
     }
 }
 
+export const updatePlayer = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if (!req.user) return next(new AppError('Authentication required', 401))
+        const { lobbyId } = req.validatedParams as LobbyIdParamInput;
+        const { playerId } = req.validatedParams as LobbyPlayerParamInput;
+        const playerData = req.validatedBody as UpdatePlayerInput;
+        const player = await PlayerServices.updateLobbyPlayerService(lobbyId, playerId, req.user, playerData)
+        return res.status(200).json({ player })
+    } catch (error) {
+        next(error)
+    }
+}

@@ -55,7 +55,7 @@ export const getLobbyPlayersService = async (lobbyId: string) => {
      })
 }
 
-export const updateLobbyPlayerService = async (playerId: string, lobbyId:string, actor:AuthUser, data: UpdatePlayerInput) => {
+export const updateLobbyPlayerService = async (lobbyId:string, playerId: string, actor:AuthUser, data: UpdatePlayerInput) => {
     await assertLobbyManager(lobbyId, actor)
     await assertPlayerInLobby(playerId, lobbyId)
 
@@ -68,7 +68,7 @@ export const updateLobbyPlayerService = async (playerId: string, lobbyId:string,
     })
 }
 
-export const deleteLobbyPlayerService = async (playerId: string, lobbyId: string, actor:AuthUser ) => {
+export const deleteLobbyPlayerService = async (lobbyId: string, playerId: string, actor:AuthUser ) => {
     await assertLobbyManager(lobbyId, actor)
     await assertPlayerInLobby(playerId, lobbyId)
     return prisma.lobbyPlayer.delete({
