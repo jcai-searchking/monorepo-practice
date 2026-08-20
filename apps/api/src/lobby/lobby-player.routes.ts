@@ -13,5 +13,6 @@ router.post('/:lobbyId/players', requireAuth, requireRole(Role.HOST, Role.ADMIN)
 
 router.patch('/:lobbyId/players/:playerId', requireAuth, requireRole(Role.HOST, Role.ADMIN), validateParams(lobbyPlayerParamSchema), validateBody(updatePlayerSchema), PlayerController.updatePlayer)
 
+router.delete('/:lobbyId/players/:playerId', requireAuth, requireRole(Role.HOST, Role.ADMIN), validateParams(lobbyPlayerParamSchema), PlayerController.removePlayer)
 
 export default router

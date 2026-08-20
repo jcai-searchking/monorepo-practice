@@ -18,7 +18,7 @@ const assertLobbyManager = async (lobbyId: string, actor:AuthUser) => {
 
 }
 
-const assertPlayerInLobby = async (playerId:string, lobbyId:string) => {
+const assertPlayerInLobby = async (lobbyId:string, playerId:string) => {
     const player = await prisma.lobbyPlayer.findUnique({
         where: { id: playerId},
         select: { lobbyId: true}
@@ -68,7 +68,7 @@ export const updateLobbyPlayerService = async (lobbyId:string, playerId: string,
     })
 }
 
-export const deleteLobbyPlayerService = async (lobbyId: string, playerId: string, actor:AuthUser ) => {
+export const removeLobbyPlayerService = async (lobbyId: string, playerId: string, actor:AuthUser ) => {
     await assertLobbyManager(lobbyId, actor)
     await assertPlayerInLobby(playerId, lobbyId)
     return prisma.lobbyPlayer.delete({
