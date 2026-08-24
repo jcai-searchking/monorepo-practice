@@ -39,6 +39,7 @@ jobs:
         env:
             DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
             JWT_SECRET: test-secret-key
+            GOOGLE_CLIENT_ID: test-google-client-id
             NODE_ENV: test
 
         steps:
@@ -55,9 +56,12 @@ jobs:
 
             - name: Generate Prisma client
               run: npx prisma generate
+              working-directory: apps/api
 
             - name: Run database migrations
               run: npx prisma migrate deploy
+              working-directory: apps/api
 
             - name: Run tests
-              run: npm test
+              run: npm run test:ci
+              working-directory: apps/api
