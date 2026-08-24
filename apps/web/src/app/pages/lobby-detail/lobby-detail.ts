@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -44,6 +44,16 @@ export class LobbyDetail implements OnInit {
 
   readonly addForm = this.fb.nonNullable.group({
     guestName: ['', [Validators.required, Validators.minLength(1)]],
+    position: [''],
+  });
+
+  private readonly guestNameInput =
+    viewChild<ElementRef<HTMLInputElement>>('guestNameInput');
+
+  // Inline roster edit — id of the row being edited, plus its working form.
+  readonly editingId = signal<string | null>(null);
+  readonly editForm = this.fb.nonNullable.group({
+    guestName: [''],
     position: [''],
   });
 
@@ -216,6 +226,7 @@ export class LobbyDetail implements OnInit {
           this.players.update((list) => [...list, player]);
           this.addForm.reset({ guestName: '', position: '' });
           this.adding.set(false);
+          this.guestNameInput()?.nativeElement.focus();
         },
         error: (err: HttpErrorResponse) => {
           this.adding.set(false);
@@ -254,7 +265,35 @@ export class LobbyDetail implements OnInit {
     this.patchPlayer(player, { paid: !player.paid });
   }
 
-  private patchPlayer(player: LobbyPlayer, changes: UpdatePlayerRequest): void {
+  startEdit(player: LobbyPlayer): void {
+    this.editingId.set(player.id);
+    this.editForm.reset({
+      guestName: player.guestName ?? player.user?.name ?? '',
+      position: player.position ?? '',
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingId.set(null);
+  }
+
+  saveEdit(player: LobbyPlayer): void {
+    const { guestName, position } = this.editForm.getRawValue();
+    const changes: UpdatePlayerRequest = { position: position.trim() };
+    // Only guests have an editable name; registered users' names come from their account.
+    if (!player.user) {
+      const name = guestName.trim();
+      if (!name) return;
+      changes.guestName = name;
+    }
+    this.patchPlayer(player, changes, () => this.editingId.set(null));
+  }
+
+  private patchPlayer(
+    player: LobbyPlayer,
+    changes: UpdatePlayerRequest,
+    onDone?: () => void,
+  ): void {
     const lobby = this.lobby();
     if (!lobby) return;
     this.savingId.set(player.id);
@@ -264,6 +303,7 @@ export class LobbyDetail implements OnInit {
           list.map((p) => (p.id === updated.id ? updated : p)),
         );
         this.savingId.set(null);
+        onDone?.();
       },
       error: () => {
         this.savingId.set(null);
@@ -387,6 +427,79 @@ export class LobbyDetail implements OnInit {
 
   clearTeams(): void {
     this.assignments.set({});
+  }
+
+  // ----- Custom team names -----
+
+  // teamIndex -> custom name; falls back to "Team A/B/..." when empty.
+  readonly teamNames = signal<Record<number, string>>({});
+
+  teamName(index: number): string {
+    return this.teamNames()[index]?.trim() || `Team ${this.teamLabel(index)}`;
+  }
+
+  renameTeam(index: number, name: string): void {
+    this.teamNames.update((m) => ({ ...m, [index]: name }));
+  }
+
+  // ----- Pools (groups of teams) -----
+
+  readonly poolCount = signal(2);
+  // teamIndex -> poolIndex
+  readonly poolAssignments = signal<Record<number, number>>({});
+
+  readonly pools = computed<number[][]>(() => {
+    const n = this.poolCount();
+    const map = this.poolAssignments();
+    const buckets: number[][] = Array.from({ length: n }, () => []);
+    for (let t = 0; t < this.teamCount(); t++) {
+      const p = map[t];
+      if (p != null && p >= 0 && p < n) buckets[p].push(t);
+    }
+    return buckets;
+  });
+
+  readonly unassignedTeams = computed<number[]>(() => {
+    const n = this.poolCount();
+    const map = this.poolAssignments();
+    const teams: number[] = [];
+    for (let t = 0; t < this.teamCount(); t++) {
+      const p = map[t];
+      if (p == null || p < 0 || p >= n) teams.push(t);
+    }
+    return teams;
+  });
+
+  readonly pooledTeamCount = computed(
+    () => this.teamCount() - this.unassignedTeams().length,
+  );
+
+  raisePools(): void {
+    const max = Math.max(2, this.teamCount());
+    this.poolCount.update((n) => Math.min(max, n + 1));
+  }
+
+  lowerPools(): void {
+    this.poolCount.update((n) => Math.max(2, n - 1));
+  }
+
+  generatePools(): void {
+    const count = Math.max(1, this.poolCount());
+    const map: Record<number, number> = {};
+    for (let t = 0; t < this.teamCount(); t++) map[t] = t % count;
+    this.poolAssignments.set(map);
+  }
+
+  assignTeamToPool(teamIndex: number, poolIndex: number): void {
+    this.poolAssignments.update((m) => ({ ...m, [teamIndex]: poolIndex }));
+  }
+
+  clearPools(): void {
+    this.poolAssignments.set({});
+  }
+
+  poolLabel(index: number): string {
+    return `Pool ${index + 1}`;
   }
 
 

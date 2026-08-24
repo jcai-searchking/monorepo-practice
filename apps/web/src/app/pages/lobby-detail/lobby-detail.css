@@ -286,6 +286,54 @@
   border-color: transparent;
 }
 
+/* Status tags double as toggle buttons for hosts. */
+button.tag {
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+button.tag:hover:not(:disabled) {
+  border-color: var(--color-secondary);
+}
+
+button.tag:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Inline edit form shown in place of a player row. */
+.player-edit {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.edit-field input {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: inherit;
+}
+
+.edit-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
 .player-actions {
   display: flex;
   gap: var(--space-xs);
@@ -669,6 +717,43 @@
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--color-primary);
+}
+
+/* Editable team name in the team maker. */
+.team-name-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.35rem;
+  margin-right: var(--space-sm);
+}
+
+.team-name-input:hover {
+  border-color: var(--color-border);
+}
+
+.team-name-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px rgba(35, 87, 137, 0.2);
+}
+
+/* Pools reuse the team-maker card styles. */
+.pool-maker {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.pool-maker .team-card-head {
+  border-bottom-color: var(--color-primary);
 }
 
 .team-count {

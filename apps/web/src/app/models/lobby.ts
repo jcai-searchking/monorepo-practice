@@ -97,6 +97,7 @@ export interface AddPlayerRequest {
 
 // PATCH /lobbies/:lobbyId/players/:playerId — all optional.
 export interface UpdatePlayerRequest {
+  guestName?: string;
   approved?: boolean;
   paid?: boolean;
   position?: string;

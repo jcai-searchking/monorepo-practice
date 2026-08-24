@@ -22,7 +22,7 @@
         </div>
         <span class="price">
           @if (l.price > 0) {
-            {{ l.price | currency: 'USD' : 'symbol' : '1.0-2' }}
+            {{ l.price | currency: 'CAD' : 'symbol' : '1.0-2' }}
           } @else {
             Free
           }
@@ -174,7 +174,7 @@
           @if ((lobby()?.price ?? 0) > 0) {
             <div class="summary-card">
               <span class="summary-value">
-                {{ amountCollected() | currency: 'USD' : 'symbol' : '1.0-2' }}
+                {{ amountCollected() | currency: 'CAD' : 'symbol' : '1.0-2' }}
               </span>
               <span class="summary-label">{{ paidCount() }}/{{ players().length }} paid</span>
             </div>
@@ -224,7 +224,7 @@
               <div class="add-fields">
                 <label class="add-field">
                   <span>Player name</span>
-                  <input type="text" formControlName="guestName" placeholder="e.g. Alex Chen" />
+                  <input #guestNameInput type="text" formControlName="guestName" placeholder="e.g. Alex Chen" />
                 </label>
                 <label class="add-field">
                   <span>Position (optional)</span>
@@ -302,7 +302,7 @@
                     >
                       <option [value]="-1" selected>Bench</option>
                       @for (t of manualTeams(); track $index) {
-                        <option [value]="$index">Team {{ teamLabel($index) }}</option>
+                        <option [value]="$index">{{ teamName($index) }}</option>
                       }
                     </select>
                   </li>
@@ -315,7 +315,12 @@
             @for (team of manualTeams(); track $index; let teamIndex = $index) {
               <div class="team-card">
                 <div class="team-card-head">
-                  <span class="team-name">Team {{ teamLabel(teamIndex) }}</span>
+                  <input
+                    class="team-name-input"
+                    [value]="teamName(teamIndex)"
+                    (change)="renameTeam(teamIndex, $any($event.target).value)"
+                    [attr.aria-label]="'Rename ' + teamName(teamIndex)"
+                  />
                   <span class="team-count">{{ team.length }}</span>
                 </div>
                 <ul class="assign-list">
@@ -332,7 +337,7 @@
                       >
                         <option [value]="-1">Bench</option>
                         @for (t of manualTeams(); track $index) {
-                          <option [value]="$index" [selected]="$index === teamIndex">Team {{ teamLabel($index) }}</option>
+                          <option [value]="$index" [selected]="$index === teamIndex">{{ teamName($index) }}</option>
                         }
                       </select>
                       <button
@@ -349,69 +354,216 @@
               </div>
             }
           </div>
+
+          @if (manualTeams().length > 0) {
+            <div class="pool-maker">
+              <div class="tm-head">
+                <h4 class="section-title">Pools</h4>
+                <div class="tm-controls">
+                  <div class="stepper">
+                    <button
+                      type="button"
+                      class="step-btn"
+                      (click)="lowerPools()"
+                      [disabled]="poolCount() <= 2"
+                      aria-label="Fewer pools"
+                    >−</button>
+                    <span class="stepper-value">{{ poolCount() }}</span>
+                    <span class="stepper-suffix">pools</span>
+                    <button
+                      type="button"
+                      class="step-btn"
+                      (click)="raisePools()"
+                      [disabled]="poolCount() >= teamCount()"
+                      aria-label="More pools"
+                    >+</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tm-actions">
+                <button type="button" class="btn btn-primary" (click)="generatePools()">
+                  {{ pooledTeamCount() ? 'Reshuffle pools' : 'Auto-generate pools' }}
+                </button>
+                @if (pooledTeamCount()) {
+                  <button type="button" class="btn btn-ghost" (click)="clearPools()">Clear pools</button>
+                }
+              </div>
+
+              <p class="field-hint">
+                Auto-place teams into pools, then fine-tune — use a team’s menu to move it to another pool.
+              </p>
+
+              <div class="team-grid">
+                <div class="team-card team-card-bench">
+                  <div class="team-card-head">
+                    <span class="team-name">Unassigned</span>
+                    <span class="team-count">{{ unassignedTeams().length }}</span>
+                  </div>
+                  <ul class="assign-list">
+                    @for (t of unassignedTeams(); track t) {
+                      <li class="assign-row">
+                        <div class="assign-id">
+                          <span class="team-player-name">{{ teamName(t) }}</span>
+                        </div>
+                        <select
+                          class="assign-select"
+                          (change)="assignTeamToPool(t, +$any($event.target).value)"
+                          [attr.aria-label]="'Assign ' + teamName(t)"
+                        >
+                          <option [value]="-1" selected>Unassigned</option>
+                          @for (pool of pools(); track $index) {
+                            <option [value]="$index">{{ poolLabel($index) }}</option>
+                          }
+                        </select>
+                      </li>
+                    } @empty {
+                      <li class="assign-empty">All teams assigned 🎉</li>
+                    }
+                  </ul>
+                </div>
+
+                @for (pool of pools(); track $index; let poolIndex = $index) {
+                  <div class="team-card">
+                    <div class="team-card-head">
+                      <span class="team-name">{{ poolLabel(poolIndex) }}</span>
+                      <span class="team-count">{{ pool.length }}</span>
+                    </div>
+                    <ul class="assign-list">
+                      @for (t of pool; track t) {
+                        <li class="assign-row">
+                          <div class="assign-id">
+                            <span class="team-player-name">{{ teamName(t) }}</span>
+                          </div>
+                          <select
+                            class="assign-select"
+                            (change)="assignTeamToPool(t, +$any($event.target).value)"
+                            [attr.aria-label]="'Move ' + teamName(t)"
+                          >
+                            <option [value]="-1">Unassigned</option>
+                            @for (p of pools(); track $index) {
+                              <option [value]="$index" [selected]="$index === poolIndex">{{ poolLabel($index) }}</option>
+                            }
+                          </select>
+                        </li>
+                      } @empty {
+                        <li class="assign-empty">No teams yet.</li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </section>
       }
 
       <ng-template #playerRow let-p let-seed="seed">
         <li class="player-row">
           <span class="player-seed">{{ seed }}</span>
-          <div class="player-id">
-            @if (p.user?.pictureUrl) {
-              <img class="player-avatar" [src]="p.user!.pictureUrl" [alt]="playerName(p)" />
-            } @else {
-              <span class="player-avatar player-avatar-fallback">
-                {{ playerName(p).charAt(0) }}
-              </span>
-            }
-            <div>
-              <span class="player-name">{{ playerName(p) }}</span>
-              @if (p.position) { <span class="player-pos">{{ p.position }}</span> }
-            </div>
-          </div>
 
-          <div class="player-tags">
-            <span class="tag" [class.tag-on]="p.approved">
-              {{ p.approved ? 'Approved' : 'Pending' }}
-            </span>
-            @if ((lobby()?.price ?? 0) > 0) {
-              <span class="tag" [class.tag-on]="p.paid">
-                {{ p.paid ? 'Paid' : 'Unpaid' }}
-              </span>
-            }
-            @if (teamOf(p.id); as tl) {
-              <span class="tag tag-team">Team {{ tl }}</span>
-            }
-          </div>
-
-          @if (canManage()) {
-            <div class="player-actions">
-              <button
-                type="button"
-                class="btn btn-ghost"
-                (click)="toggleApproved(p)"
-                [disabled]="savingId() === p.id"
-              >
-                {{ p.approved ? 'Unapprove' : 'Approve' }}
-              </button>
-              @if ((lobby()?.price ?? 0) > 0) {
+          @if (editingId() === p.id) {
+            <form class="player-edit" [formGroup]="editForm" (ngSubmit)="saveEdit(p)">
+              @if (!p.user) {
+                <label class="edit-field">
+                  <span>Name</span>
+                  <input type="text" formControlName="guestName" placeholder="Player name" />
+                </label>
+              }
+              <label class="edit-field">
+                <span>Position</span>
+                <input type="text" formControlName="position" placeholder="e.g. Setter" />
+              </label>
+              <div class="edit-actions">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="savingId() === p.id"
+                >
+                  {{ savingId() === p.id ? 'Saving…' : 'Save' }}
+                </button>
                 <button
                   type="button"
                   class="btn btn-ghost"
-                  (click)="togglePaid(p)"
+                  (click)="cancelEdit()"
                   [disabled]="savingId() === p.id"
                 >
-                  {{ p.paid ? 'Mark unpaid' : 'Mark paid' }}
+                  Cancel
                 </button>
+              </div>
+            </form>
+          } @else {
+            <div class="player-id">
+              @if (p.user?.pictureUrl) {
+                <img class="player-avatar" [src]="p.user!.pictureUrl" [alt]="playerName(p)" />
+              } @else {
+                <span class="player-avatar player-avatar-fallback">
+                  {{ playerName(p).charAt(0) }}
+                </span>
               }
-              <button
-                type="button"
-                class="btn btn-danger"
-                (click)="removePlayer(p)"
-                [disabled]="savingId() === p.id"
-              >
-                Remove
-              </button>
+              <div>
+                <span class="player-name">{{ playerName(p) }}</span>
+                @if (p.position) { <span class="player-pos">{{ p.position }}</span> }
+              </div>
             </div>
+
+            <div class="player-tags">
+              @if (canManage()) {
+                <button
+                  type="button"
+                  class="tag"
+                  [class.tag-on]="p.approved"
+                  (click)="toggleApproved(p)"
+                  [disabled]="savingId() === p.id"
+                >
+                  {{ p.approved ? 'Approved' : 'Pending' }}
+                </button>
+                @if ((lobby()?.price ?? 0) > 0) {
+                  <button
+                    type="button"
+                    class="tag"
+                    [class.tag-on]="p.paid"
+                    (click)="togglePaid(p)"
+                    [disabled]="savingId() === p.id"
+                  >
+                    {{ p.paid ? 'Paid' : 'Unpaid' }}
+                  </button>
+                }
+              } @else {
+                <span class="tag" [class.tag-on]="p.approved">
+                  {{ p.approved ? 'Approved' : 'Pending' }}
+                </span>
+                @if ((lobby()?.price ?? 0) > 0) {
+                  <span class="tag" [class.tag-on]="p.paid">
+                    {{ p.paid ? 'Paid' : 'Unpaid' }}
+                  </span>
+                }
+              }
+              @if (teamOf(p.id); as tl) {
+                <span class="tag tag-team">Team {{ tl }}</span>
+              }
+            </div>
+
+            @if (canManage()) {
+              <div class="player-actions">
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  (click)="startEdit(p)"
+                  [disabled]="savingId() === p.id"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  (click)="removePlayer(p)"
+                  [disabled]="savingId() === p.id"
+                >
+                  Remove
+                </button>
+              </div>
+            }
           }
         </li>
       </ng-template>

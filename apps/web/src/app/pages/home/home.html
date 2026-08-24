@@ -42,7 +42,7 @@
             <h3 class="lobby-name">{{ lobby.lobbyName }}</h3>
             <span class="price">
               @if (lobby.price > 0) {
-                {{ lobby.price | currency: 'USD' : 'symbol' : '1.0-2' }}
+                {{ lobby.price | currency: 'CAD' : 'symbol' : '1.0-2' }}
               } @else {
                 Free
               }
